@@ -7,7 +7,6 @@ pub fn day03() -> io::Result<()> {
     let mut reader = BufReader::new(f);
     let mut result = 0;
 
-
     // ### PART 1  ###
     // read a line into buffer
     // for line in reader.lines() {
@@ -32,45 +31,40 @@ pub fn day03() -> io::Result<()> {
     //     result += comp;}
 
     // ### PART 2 ###
-    // I need to find the 12 digit that combined creates the largest 12 digit number 
-    let mut lowest12digit ="100000000000";
+    // I need to find the 12 digit that combined creates the largest 12 digit number
     for line in reader.lines() {
         let line = line?;
         let line = line.trim();
-        let mut calcnum=0;
-        let mut idx=0;
-        for i in idx..(line.len()-12) { 
-            // println!("Current 12-digit substring: {}", &line[0..line.len()-12]);
-            let substring = &line[idx..line.len()-12];
-            // Find the biggest single digit in this substring
-            let mut max_digit = 0;
-            // substring.chars()
-            //     .filter_map(|c| c.to_digit(10))
-            //     .max()
-            //     .unwrap_or(0);
-            let mut max_index = 0;
-            for (idxt, c) in substring.chars().enumerate() {
-                if let Some(digit) = c.to_digit(10) {
-                    if digit > max_digit {
-                        max_digit = digit;
-                        max_index = idxt;
-                    }
-                }
-            }
-            if idx==max_index{
-                idx +=1;
-            } else {
-                idx = max_index;
-            }
-            calcnum = calcnum * 10 + max_digit;
-            println!("Max digit found: {}, Current number: {}", max_digit, calcnum);
-            // break;
-        }
-        
+        let mut calcnum:u128 = 0;
+        let mut idx = 0;
+        let mut max_digit = 0;
+        let mut idx_new = 0;
+        for i in 0..12 {
+            (max_digit,idx_new) = find_max(&line[idx..], 12-i);
+            calcnum = calcnum * 10 + max_digit as u128;
+            idx += idx_new as usize + 1;
 
-        
+        }
+        // println!(
+        //         "Max digit found: {}, Current number: {}",
+        //         max_digit, calcnum
+        //     );
+        result += calcnum;
     }
 
     println!("Day 03 result: {}", result);
     Ok(())
+}
+
+fn find_max(s: &str, idx_left: usize) -> (u32, u32) {
+    let mut max_digit = 0;
+    let mut index_max = 0;
+    for i in 0..=(s.len() - idx_left) {
+        let digit = s.chars().nth(i).unwrap().to_digit(10).unwrap();
+        if digit > max_digit {
+            max_digit = digit;
+            index_max = i;
+        }
+    }
+    (max_digit, index_max as u32)
 }
