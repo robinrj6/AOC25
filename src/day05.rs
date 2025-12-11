@@ -1,3 +1,4 @@
+use std::cmp;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::result;
@@ -6,11 +7,11 @@ pub fn day05() -> io::Result<()> {
     println!("Running Day 05 solution...");
     let f = File::open("src/input5.txt")?;
     let mut reader = BufReader::new(f);
-    let mut result: i32 = 0;
+    let mut result: i128 = 0;
 
     let (mut start, mut finish) = (0, 0);
     let mut validNums: Vec<(usize, usize)> = Vec::new();
-    let mut validNums2: Vec<(usize, usize)> = Vec::new();
+    let mut validNums2: Vec<usize> = Vec::new();
 
     let mut flag = true;
     for line in reader.lines() {
@@ -26,6 +27,12 @@ pub fn day05() -> io::Result<()> {
             );
 
             validNums.push((start, finish));
+            // for num in start..=finish {
+            //     if validNums2.contains(&num) {
+            //         continue;
+            //     }
+            //     validNums2.push(num);
+            // }
 
             // println!("Valid numbers from {} to {} stored.", start, finish);
         }
@@ -45,8 +52,22 @@ pub fn day05() -> io::Result<()> {
         // }
     }
 
-
-    println!("{:?}", validNums);
-    // println!("Result: {}", result);
+    // ### PART 2 ###
+    validNums.sort_by(|a, b| a.0.cmp(&b.0));
+    for i in 0..validNums.len() - 1 {
+        while i < validNums.len() - 1 && validNums[i + 1].0 <= validNums[i].1 {
+            validNums[i].1 = cmp::max(validNums[i].1, validNums[i + 1].1);
+            validNums.remove(i + 1);
+            if i + 1 >= validNums.len() {
+                break;
+            }
+        }
+    }
+    for (s, f) in &validNums {
+        result += ((f - s) + 1) as i128;
+        }
+    // println!("{:?}", validNums);
+    println!("Result: {}", result);
     Ok(())
 }
+
